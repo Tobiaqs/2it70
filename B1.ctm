@@ -1,0 +1,110 @@
+%% cTM program that accepts a language a^n|b^n|c^n for all n>=0. It returns Y if accepted, N if rejected.
+%% Author: Tobias Sijtsma
+
+%% Input empty? Accept immediately
+q0 #/Y,R q12
+
+%% Input not empty? Go to q1
+q0 a/a,L q1
+q0 b/b,L q1
+q0 c/c,L q1
+
+%% Add the tape start marker P, then go to q2
+q1 #/P,R q2
+
+%% Seek to the end of the tape...
+q2 a/a,R q2
+q2 b/b,R q2
+q2 c/c,R q2
+
+%% Add the tape end marker when the tape end is encountered
+q2 #/Q,L q3
+
+%% Move the tape head at the start of the input
+q3 a/a,L q3
+q3 b/b,L q3
+q3 c/c,L q3
+q3 #/#,L q3
+
+%% When tape start marker is encountered, move right to q4 and start looking for symbols
+q3 P/P,R q4
+
+%% Find and erase an a. When a is found, move to q5.
+q4 a/#,R q5
+
+%% Ignore
+q4 #/#,R q4
+
+%% Reject if unexpected symbol is found
+q4 b/b,R q10
+q4 c/c,R q10
+q4 Q/Q,L q10
+
+%% Find and erase a b. When b is found, move to q6
+q5 b/#,R q6
+
+%% Ignore blank and a
+q5 #/#,R q5
+q5 a/a,R q5
+
+%% Reject if unexpected symbol is found
+q5 c/c,R q10
+q5 Q/Q,L q10
+
+%% Find and erase a c
+q6 c/#,L q7
+
+%% Ignore blank and b
+q6 b/b,R q6
+q6 #/#,R q6
+
+%% Reject if unexpected symbol is found
+q6 Q/Q,L q10
+q6 a/a,R q10
+
+%% Move the tape head at the start of the input
+q7 a/a,L q7
+q7 b/b,L q7
+q7 c/c,L q7
+q7 #/#,L q7
+
+%% Tape start marker found? Move to q8
+q7 P/P,R q8
+
+%% Check if the tape is empty
+%% Not empty? Go to q3 again.
+q8 a/a,L q3
+q8 b/b,L q3
+q8 c/c,L q3
+
+%% As long as the input seems empty, stay in q8
+q8 #/#,R q8
+
+%% End of tape reached? The tape is empty! Seek back to the tape start marker in q9
+q8 Q/#,L q9
+
+%% Move to the tape start marker
+q9 #/#,L q9
+
+%% Write acceptance token at the beginning of the tape
+q9 P/Y,R q12
+
+%% Below states are used in case of a rejection
+%% Seek to the right end of the tape, then move left to q11
+q10 a/a,R q10
+q10 b/b,R q10
+q10 c/c,R q10
+q10 #/#,R q10
+
+%% Get rid of tape end marker and move to q11
+q10 Q/#,L q11
+
+%% Move to the left and erase everything that is encountered. When tape start marker is encountered, replace it with an N and move to the final state.
+q11 a/#,L q11
+q11 b/#,L q11
+q11 c/#,L q11
+q11 #/#,L q11
+q11 P/N,R q12
+
+%% Move one place to the left
+q12 #/#,L q13
