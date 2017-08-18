@@ -1,0 +1,59 @@
+%% cTM program that re-formats 2s complement numbers. This program can handle positive, negative, carry.
+%% Author: Tobias Sijtsma
+
+%% If number is positive, go to q2
+q0 0/#,R q1
+
+%% If negative go to q4 and erase the sign bit
+q0 1/#,R q4
+
+%% If invalid input, go to final state immediately
+q0 #/#,R q3
+
+%% Remove zeroes and if a 1 is found, move right left
+q1 0/#,R q1
+q1 1/1,R q3
+q1 #/#,L q9
+
+%% Move one place to the left
+q3 0/0,L q10
+q3 1/1,L q10
+q3 #/#,L q10
+
+%% Flip all bits until we reach the end of the tape on the right
+q4 1/0,R q4
+q4 0/1,R q4
+q4 #/#,L q5
+
+%% Move left and replace all 1s with 0s until we find a 0. Goal is to add one to the number
+q5 1/0,L q5
+
+%% 0 found? Change it to a one and move to end of tape
+q5 0/1,L q6
+
+%% There are no 0s in the number, hence the number is -(1111111 + 1) = -10000000
+q5 #/1,L q8
+
+%% Move to left end of tape and move back to the right
+q6 0/0,L q6
+q6 1/1,L q6
+q6 #/#,R q7
+
+%% Get rid of trailing 0s
+q7 0/#,R q7
+
+%% First 1 found? Add the minus sign in front of it
+q7 1/1,L q8
+
+%% No 1 found? Then the number == 0. We should have a 0
+q7 #/#,L q9
+
+%% Add the minus sign in front of the left-most digit, and then move to left end of tape
+q8 0/-,R q3
+q8 1/-,R q3
+q8 #/-,R q3
+
+%% Set right-most digit to 0 and then go to final state
+q9 0/0,R q3
+q9 1/0,R q3
+q9 #/0,R q3
