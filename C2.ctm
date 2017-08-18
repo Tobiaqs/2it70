@@ -1,0 +1,297 @@
+%% cTM program according to specifications assignment C2
+%% Author: Tobias Sijtsma
+
+%% Initial state. If the input is empty, we terminate right away.
+q0 #/#,L qF
+q0 a/a,L q1
+q0 b/b,L q1
+q0 c/c,L q1
+
+%% Continue to the program
+q1 #/#,R qAB
+
+
+%% In the code below, states are described that together find out the following:
+%% qAB: is #a > #b? if yes, go to qAC. if not, go to qBA
+%%   qAC: is #a > #c? if yes, a^n. if not, go to qBA
+%% qBA: is #b > #a? if yes, go to qBC. if not, c^n.
+%%   qBC: is #b > #c? if yes, b^n. if not, c^n.
+
+
+%% Scan for a lowercase a and capitalize it
+qAB A/A,R qAB
+
+%% a found? capitalize and go to qAB2
+qAB a/A,L qAB2
+qAB B/B,R qAB
+qAB b/b,R qAB
+qAB c/c,R qAB
+
+%% end of tape reached? #a <= #b. go to qAB5
+qAB #/#,L qAB5
+
+
+%% Move to tape begin
+qAB2 A/A,L qAB2
+qAB2 a/a,L qAB2
+qAB2 B/B,L qAB2
+qAB2 b/b,L qAB2
+qAB2 c/c,L qAB2
+
+%% Start of tape reached? go to qAB3
+qAB2 #/#,R qAB3
+
+
+%% Scan for a lowercase b and capitalize it
+qAB3 A/A,R qAB3
+qAB3 a/a,R qAB3
+qAB3 B/B,R qAB3
+
+%% b found? Capitalize and go to qAB4
+qAB3 b/B,L qAB4
+qAB3 c/c,R qAB3
+
+%% End of tape reached? #a > #b. Go to qAB6
+qAB3 #/#,L qAB6
+
+
+%% Move to tape begin
+qAB4 A/A,L qAB4
+qAB4 a/a,L qAB4
+qAB4 B/B,L qAB4
+qAB4 b/b,L qAB4
+qAB4 c/c,L qAB4
+
+%% Start of tape reached? go to qAB
+qAB4 #/#,R qAB
+
+
+%% #a <= #b. Decapitalize all characters, move to tape start and go to qBA
+qAB5 A/a,L qAB5
+qAB5 a/a,L qAB5
+qAB5 B/b,L qAB5
+qAB5 b/b,L qAB5
+qAB5 c/c,L qAB5
+
+%% Start of tape reached? go to qBA
+qAB5 #/#,R qBA
+
+
+%% #a > #b. Decapitalize all characters, move to tape start and go to qAC
+qAB6 A/a,L qAB6
+qAB6 a/a,L qAB6
+qAB6 B/b,L qAB6
+qAB6 b/b,L qAB6
+qAB6 c/c,L qAB6
+
+%% Start of tape reached? go to qAC
+qAB6 #/#,R qAC
+
+
+%% Scan for a lowercase a and capitalize it
+qAC A/A,R qAC
+
+%% a found? capitalize and go to qAC2
+qAC a/A,L qAC2
+
+qAC b/b,R qAC
+qAC C/C,R qAC
+qAC c/c,R qAC
+
+%% End of tape reached? #a <= #c. Go to qAC5
+qAC #/#,L qAC5
+
+
+%% Move to tape begin
+qAC2 A/A,L qAC2
+qAC2 a/a,L qAC2
+qAC2 b/b,L qAC2
+qAC2 C/C,L qAC2
+qAC2 c/c,L qAC2
+
+%% Start of tape reached? go to qAC2
+qAC2 #/#,R qAC3
+
+
+%% Scan for a lowercase c and capitalize it
+qAC3 A/A,R qAC3
+qAC3 a/a,R qAC3
+qAC3 b/b,R qAC3
+qAC3 C/C,R qAC3
+
+%% a found? capitalize and go to qAC4
+qAC3 c/C,L qAC4
+
+%% End of tape reached? #a > #c. Go to qAC6
+qAC3 #/#,L qAC6
+
+
+%% Move to tape begin
+qAC4 A/A,L qAC4
+qAC4 a/a,L qAC4
+qAC4 b/b,L qAC4
+qAC4 C/C,L qAC4
+qAC4 c/c,L qAC4
+
+%% Start of tape reached? go to qAC
+qAC4 #/#,R qAC
+
+
+%% #a <= #c. Decapitalize all characters, move to tape start and go to qBA
+qAC5 A/a,L qAC5
+qAC5 a/a,L qAC5
+qAC5 b/b,L qAC5
+qAC5 C/c,L qAC5
+qAC5 c/c,L qAC5
+
+%% Start of tape reached? go to qBA
+qAC5 #/#,R qBA
+
+
+%% #a > #c. Replace all chars with a. Then go to the final state.
+qAC6 A/a,L qAC6
+qAC6 a/a,L qAC6
+qAC6 b/a,L qAC6
+qAC6 C/a,L qAC6
+qAC6 c/a,L qAC6
+
+%% Start of tape reached? Go to final state.
+qAC6 #/#,R qF
+
+
+%% Scan for a lowercase b and capitalize it
+qBA A/A,R qBA
+qBA a/a,R qBA
+qBA B/B,R qBA
+
+%% a found? capitalize and go to qBA2
+qBA b/B,L qBA2
+
+qBA c/c,R qBA
+
+%% End of tape reached? #b <= #a. Go to qBA5
+qBA #/#,L qBA5
+
+
+%% Move to tape begin
+qBA2 A/A,L qBA2
+qBA2 a/a,L qBA2
+qBA2 B/B,L qBA2
+qBA2 b/b,L qBA2
+qBA2 c/c,L qBA2
+
+%% Start of tape reached? go to qBA3
+qBA2 #/#,R qBA3
+
+
+%% Scan for a lowercase a and capitalize it
+qBA3 A/A,R qBA3
+
+%% a found? capitalize and go to qBA4
+qBA3 a/A,L qBA4
+
+qBA3 B/B,R qBA3
+qBA3 b/b,R qBA3
+qBA3 c/c,R qBA3
+
+%% End of tape reached? #b > #a. Go to qBA6
+qBA3 #/#,L qBA6
+
+
+%% Move to tape begin
+qBA4 A/A,L qBA4
+qBA4 a/a,L qBA4
+qBA4 B/B,L qBA4
+qBA4 b/b,L qBA4
+qBA4 c/c,L qBA4
+
+%% Start of tape reached? go to qBA.
+qBA4 #/#,R qBA
+
+
+%% #b <= #a. Replace all chars with c. Then go to the final state.
+qBA5 A/c,L qBA5
+qBA5 a/c,L qBA5
+qBA5 B/c,L qBA5
+qBA5 b/c,L qBA5
+qBA5 c/c,L qBA5
+
+%% Start of tape reached? go to final state.
+qBA5 #/#,R qF
+
+
+%% #b > #a. Decapitalize all characters, move to tape start and go to qBC
+qBA6 A/a,L qBA6
+qBA6 a/a,L qBA6
+qBA6 B/b,L qBA6
+qBA6 b/b,L qBA6
+qBA6 c/c,L qBA6
+
+%% Start of tape reached? go to qBC
+qBA6 #/#,R qBC
+
+
+%% Scan for a lowercase b and capitalize it
+qBC a/a,R qBC
+qBC B/B,R qBC
+qBC b/B,L qBC2
+qBC C/C,R qBC
+qBC c/c,R qBC
+
+%% End of tape reached? #b <= #c. Go to qBC5
+qBC #/#,L qBC5
+
+
+%% Move to tape begin
+qBC2 a/a,L qBC2
+qBC2 B/B,L qBC2
+qBC2 b/b,L qBC2
+qBC2 C/C,L qBC2
+qBC2 c/c,L qBC2
+
+%% Start of tape reached? go to qBC3
+qBC2 #/#,R qBC3
+
+
+%% Scan for a lowercase c and capitalize it
+qBC3 a/a,R qBC3
+qBC3 B/B,R qBC3
+qBC3 b/b,R qBC3
+qBC3 C/C,R qBC3
+qBC3 c/C,L qBC4
+
+%% End of tape reached? #b > #c. Go to qBC6
+qBC3 #/#,L qBC6
+
+
+%% Move to tape begin
+qBC4 a/a,L qBC4
+qBC4 B/B,L qBC4
+qBC4 b/b,L qBC4
+qBC4 C/C,L qBC4
+qBC4 c/c,L qBC4
+
+%% Start of tape reached? go to qBC
+qBC4 #/#,R qBC
+
+
+%% #b <= #c. Replace all chars with c
+qBC5 a/c,L qBC5
+qBC5 B/c,L qBC5
+qBC5 b/c,L qBC5
+qBC5 C/c,L qBC5
+qBC5 c/c,L qBC5
+
+%% Start of tape reached? Go to final state.
+qBC5 #/#,R qF
+
+
+%% #b > #c. Replace all chars with b
+qBC6 a/b,L qBC6
+qBC6 B/b,L qBC6
+qBC6 b/b,L qBC6
+qBC6 C/b,L qBC6
+qBC6 c/b,L qBC6
+
+%% Start of tape reached? Go to final state.
+qBC6 #/#,R qF
